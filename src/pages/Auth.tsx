@@ -92,7 +92,7 @@ const Auth = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm">Password</label>
+            <label className="block text-sm">Password *must be 6+ characters*</label>
             <input
               type="password"
               value={password}
