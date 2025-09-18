@@ -17,19 +17,22 @@ const Questions = () => {
     correct_option: 0,
   });
   const [editingId, setEditingId] = useState<number | null>(null);
-  const { token } = useAuthStore();
+
+  const { token, user } = useAuthStore();
 
   useEffect(() => {
-    fetchQuestions();
-  }, []);
+    if (user?.role === "admin") {
+      fetchQuestions();
+    } else {
+      setQuestions([]); 
+    }
+  }, [user]);
 
   const fetchQuestions = async () => {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/questions`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setQuestions(response.data);
     } catch (error) {
@@ -39,6 +42,7 @@ const Questions = () => {
 
   const handleCreateOrUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (user?.role !== "admin") return; 
     try {
       const url = editingId
         ? `${import.meta.env.VITE_API_URL}/questions/${editingId}`
@@ -47,6 +51,7 @@ const Questions = () => {
       const response = await axios[method](url, newQuestion, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       if (editingId) {
         setQuestions(
           questions.map((q) => (q.id === editingId ? response.data : q))
@@ -55,6 +60,7 @@ const Questions = () => {
       } else {
         setQuestions([...questions, response.data]);
       }
+
       setNewQuestion({
         question_text: "",
         options: ["", "", "", ""],
@@ -66,6 +72,7 @@ const Questions = () => {
   };
 
   const handleEdit = (question: Question) => {
+    if (user?.role !== "admin") return;
     setEditingId(question.id);
     setNewQuestion({
       question_text: question.question_text,
@@ -75,6 +82,7 @@ const Questions = () => {
   };
 
   const handleDelete = async (id: number) => {
+    if (user?.role !== "admin") return;
     try {
       await axios.delete(`${import.meta.env.VITE_API_URL}/questions/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -84,6 +92,16 @@ const Questions = () => {
       console.error("Error deleting question:", error);
     }
   };
+
+  if (user?.role !== "admin") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 text-lg">
+          You do not have permission to view questions.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4">
@@ -139,8 +157,8 @@ const Questions = () => {
                 })
               }
               className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400"
-              min="0"
-              max="3"
+              min={0}
+              max={3}
               required
             />
           </div>
@@ -167,7 +185,9 @@ const Questions = () => {
                 <li
                   key={index}
                   className={`${
-                    index === question.correct_option ? "text-green-600 font-semibold" : ""
+                    index === question.correct_option
+                      ? "text-green-600 font-semibold"
+                      : ""
                   }`}
                 >
                   {index + 1}. {option}

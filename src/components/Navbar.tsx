@@ -31,8 +31,9 @@ const Navbar = () => {
         }
       );
 
+      console.log(response)
       // ✅ Update store with new role
-      setAuth(token, { ...user, role: response.data.role });
+      setAuth(token, { ...user, role: response.data.user.role });
       setDropdownOpen(false);
       alert(`Role updated successfully`);
     } catch (error: any) {
@@ -86,7 +87,6 @@ const Navbar = () => {
                     <span className="text-gray-700">
                       Hi, {user.name || user.email}
                     </span>
-                    {/* <span className="text-xs text-gray-500">({user.role})</span> */}
                   </button>
 
                   {dropdownOpen && (
