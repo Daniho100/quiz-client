@@ -86,7 +86,7 @@ const Navbar = () => {
                     <span className="text-gray-700">
                       Hi, {user.name || user.email}
                     </span>
-                    <span className="text-xs text-gray-500">({user.role})</span>
+                    {/* <span className="text-xs text-gray-500">({user.role})</span> */}
                   </button>
 
                   {dropdownOpen && (
