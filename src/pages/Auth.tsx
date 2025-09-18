@@ -24,7 +24,7 @@ const Auth = () => {
 
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/auth/${endpoint}`,
-      payload
+      payload,
     );
 
     if (isLogin) {
